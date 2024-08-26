@@ -14,7 +14,7 @@ func main() {
 		Prefix:    "example",
 	}
 	log := kateb.New(os.Stdout, kc)
-	log.Info("Application started", map[string]any{"version": "1.0.0"})
+	log.Info("Application started", map[string]any{"version": "0.0.0"})
 	log.Warn("Warning issued", nil)
 	log.Error("An error occurred", map[string]any{"error": "something went wrong"})
 }
