@@ -64,16 +64,15 @@ type Config struct {
 	Level     slog.Level
 	AddSource bool
 	Prefix    string
+	Colorize  bool
 }
 
 type Logger struct {
-	sl             *slog.Logger
-	config         Config
-	shouldColorize bool
+	sl     *slog.Logger
+	config Config
 }
 
 func New(writer io.Writer, config Config) *Logger {
-	shouldColorize := writer == os.Stdout
 
 	return &Logger{
 		sl: slog.New(slog.NewJSONHandler(writer, &slog.HandlerOptions{
@@ -98,22 +97,24 @@ func New(writer io.Writer, config Config) *Logger {
 				return a
 			},
 		})),
-		config:         config,
-		shouldColorize: shouldColorize,
+		config: config,
 	}
 }
 func (r *Logger) setColor(level slog.Level) *Logger {
-	switch level {
-	case slog.LevelDebug:
-		fmt.Println(colorCyan)
-	case slog.LevelInfo:
-		fmt.Println(colorWhite)
-	case slog.LevelWarn:
-		fmt.Println(colorBrightYellow)
-	case slog.LevelError:
-		fmt.Println(colorRed)
-	default:
-		fmt.Println(colorReset)
+
+	if r.config.Colorize {
+		switch level {
+		case slog.LevelDebug:
+			fmt.Println(colorCyan)
+		case slog.LevelInfo:
+			fmt.Println(colorWhite)
+		case slog.LevelWarn:
+			fmt.Println(colorBrightYellow)
+		case slog.LevelError:
+			fmt.Println(colorRed)
+		default:
+			fmt.Println(colorReset)
+		}
 	}
 
 	return r
