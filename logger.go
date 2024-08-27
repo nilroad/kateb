@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -12,23 +13,28 @@ var logger Logger
 
 // ANSI color codes for terminal output
 const (
-	colorReset         = "\033[0m"
-	colorBlack         = "\033[30m"
-	colorRed           = "\033[31m"
-	colorGreen         = "\033[32m"
-	colorYellow        = "\033[33m"
-	colorBlue          = "\033[34m"
-	colorMagenta       = "\033[35m"
-	colorCyan          = "\033[36m"
-	colorWhite         = "\033[37m"
-	colorBrightRed     = "\033[91m"
-	colorBrightGreen   = "\033[92m"
-	colorBrightYellow  = "\033[93m"
-	colorBrightBlue    = "\033[94m"
-	colorBrightMagenta = "\033[95m"
-	colorBrightCyan    = "\033[96m"
-	colorBrightWhite   = "\033[97m"
+	colorReset        = "\033[0m"
+	colorRed          = "\033[31m"
+	colorCyan         = "\033[36m"
+	colorWhite        = "\033[37m"
+	colorBrightYellow = "\033[93m"
 )
+
+func ConvertToLevel(level string) slog.Level {
+	level = strings.ToLower(level)
+	switch level {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelDebug
+	}
+}
 
 func init() {
 	logger.sl = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
@@ -73,7 +79,6 @@ type Logger struct {
 }
 
 func New(writer io.Writer, config Config) *Logger {
-
 	return &Logger{
 		sl: slog.New(slog.NewJSONHandler(writer, &slog.HandlerOptions{
 			AddSource: config.AddSource,
@@ -101,7 +106,6 @@ func New(writer io.Writer, config Config) *Logger {
 	}
 }
 func (r *Logger) setColor(level slog.Level) *Logger {
-
 	if r.config.Colorize {
 		switch level {
 		case slog.LevelDebug:
@@ -125,7 +129,6 @@ func (r *Logger) restColor() *Logger {
 	return r
 }
 func (r *Logger) Error(message string, args map[string]any) {
-
 	r.setColor(slog.LevelError).sl.Error(r.config.Prefix+":"+message, contextKey, args)
 	r.restColor()
 }
